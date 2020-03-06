@@ -11,12 +11,27 @@ var CLIENT_ID = require('../config/config').CLIENT_ID;
 const { OAuth2Client } = require('google-auth-library');
 const client = new OAuth2Client(CLIENT_ID);
 
+var mdAutentificacion = require('../middlewares/autenticacion');
+
 // Inicializar variables
 var app = express();
 
 // =================================================
-// Autentificación Google
+// Renorvar Token
 // =================================================
+app.get('/renuevatoken',mdAutentificacion.verificaToken, ( req, res ) =>{
+
+    var token = jwt.sign({ usuario: req.usuario }, SEED, { expiresIn: '4h' });
+
+    res.status(200).json({
+        ok: true,
+        token
+    });
+})
+
+// =================================================
+// Autentificación Google
+// =
 
 async function verify(token) {
     const ticket = await client.verifyIdToken({
@@ -77,7 +92,8 @@ app.post('/google', async(req, res) => {
                     ok: true,
                     usuario: usuarioDB,
                     token: token,
-                    id: usuarioDB._id
+                    id: usuarioDB._id,
+                    menu: obtenerMenu( usuarioDB.role )
                 });
             }
         } else {
@@ -96,7 +112,8 @@ app.post('/google', async(req, res) => {
                     ok: true,
                     usuario: usuarioDB,
                     token: token,
-                    id: usuarioDB._id
+                    id: usuarioDB._id,
+                    menu: obtenerMenu( usuarioDB.role )
                 });
 
             })
@@ -149,18 +166,73 @@ app.post('/', (req, res) => {
 
         // Crear un token
         usuarioDB.password = '';
-        var token = jwt.sign({ usuario: usuarioDB }, SEED, { expiresIn: 144000 });
+        var token = jwt.sign({ usuario: usuarioDB }, SEED, { expiresIn: '4h' });
 
         res.status(200).json({
             ok: true,
             usuario: usuarioDB,
             token: token,
-            id: usuarioDB._id
+            id: usuarioDB._id,
+            menu: obtenerMenu( usuarioDB.role )
         });
 
     });
 
 });
+
+
+function obtenerMenu( ROLE ) {
+
+    var menu = [{
+      titulo: 'Principal',
+      icono: 'mdi mdi-gauge',
+      submenu: [
+        {
+          titulo: 'Dashboard',
+          url: '/dashboard'
+      },
+        {
+          titulo: 'Progress',
+          url: '/progress'
+      },
+        {
+          titulo: 'Gráficas',
+          url: '/graficas1'
+      },
+        {
+          titulo: 'Promesas',
+          url: '/promesas'
+      },
+        {
+          titulo: 'Rxjs',
+          url: '/rxjs'
+      }]
+    },
+    {
+      titulo: 'Mantenimientos',
+      icono: 'mdi mdi-folder-lock-open',
+      submenu: [
+        // {
+        //   titulo: 'Usuarios',
+        //   url: '/usuarios'
+        // },
+        {
+          titulo: 'Hospitales',
+          url: '/hospitales'
+        },
+        {
+          titulo: 'Médicos',
+          url: '/medicos'
+        },
+      ]
+    }];
+
+    if ( ROLE === 'ADMIN_ROLE') {
+        menu[1].submenu.unshift( {titulo: 'Usuarios', url: '/usuarios'} );
+    }
+
+    return menu;
+}
 
 
 

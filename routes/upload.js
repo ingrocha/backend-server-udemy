@@ -132,7 +132,6 @@ function subirPorTipo(tipo, id, nombreArchivo, res) {
 
     if (tipo === 'medicos') {
         Medico.findById(id, (err, medico) => {
-            var pathViejo = './uploads/medicos/' + medico.img;
 
             if (!medico) {
                 return res.status(404).json({
@@ -142,9 +141,16 @@ function subirPorTipo(tipo, id, nombreArchivo, res) {
                 });
             }
 
+            
+
             // Si existe elimina la imagen anterior
-            if (fs.existsSync(pathViejo)) {
-                fs.unlinkSync(pathViejo);
+            if (medico.img) {
+            	if (medico.img !== '') {
+		            var pathViejo = './uploads/medicos/' + medico.img;
+		            if (fs.existsSync(pathViejo)) {
+		                fs.unlinkSync(pathViejo);
+		            }
+            	}
             }
 
             medico.img = nombreArchivo;

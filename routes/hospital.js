@@ -21,7 +21,7 @@ app.get('/', (req, res, next) => {
         .limit(5)
         .skip(desde)
         .exec(
-            (error, hoteles) => {
+            (error, hospitales) => {
                 if (error) {
                     return res.status(500).json({
                         ok: false,
@@ -34,7 +34,7 @@ app.get('/', (req, res, next) => {
 
                     res.status(200).json({
                         ok: true,
-                        hoteles,
+                        hospitales,
                         contador
 
                     });
@@ -42,6 +42,38 @@ app.get('/', (req, res, next) => {
             })
 
 });
+
+// ==========================================
+// Obtener Hospital por ID
+// ==========================================
+app.get('/:id', (req, res) => {
+    var id = req.params.id;
+    Hospital.findById(id)
+        .populate('usuario', 'nombre img email')
+        .exec((err, hospital) => {
+            if (err) {
+                return res.status(500).json({
+                    ok: false,
+                    mensaje: 'Error al buscar hospital',
+                    errors: err
+                });
+            }
+            if (!hospital) {
+                return res.status(400).json({
+                    ok: false,
+                    mensaje: 'El hospital con el id ' + id + 'no existe ',
+                    errors: {
+                        message: 'No existe un hospital con ese ID '
+                    }
+                });
+            }
+            res.status(200).json({
+                ok: true,
+                hospital: hospital
+            });
+        });
+});
+
 // ==============================================================================
 // Crear un nuevo usuario
 // ==============================================================================
@@ -52,7 +84,6 @@ app.post('/', mdAutentificacion.verificaToken, (req, res) => {
     var hospital = new Hospital({
         nombre: body.nombre,
         img: body.img,
-        email: body.email,
         usuario: req.usuario._id
     });
 
@@ -78,7 +109,7 @@ app.post('/', mdAutentificacion.verificaToken, (req, res) => {
 // Actualizar un nuevo usuario
 // ==============================================================================
 
-app.put('/:id', (req, res) => {
+app.put('/:id', mdAutentificacion.verificaToken, (req, res) => {
     var id = req.params.id;
     var body = req.body;
 

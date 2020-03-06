@@ -14,12 +14,32 @@ app.use(bodyParser.json());
 // CORS
  
 app.use(function(req, res, next) {
-  res.header("Access-Control-Allow-Origin", "*"); // update to match the domain you will make the request from
-  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-  res.header("Access-Control-Allow-Methods", "POST, GET, OPTIONS, PUT, DELETE");
-  next();
+    res.header('Access-Control-Allow-Origin', '*');
+    res.header('Access-Control-Allow-Headers', 'Origin, Authorization, X-API-KEY, Origin, X-Requested-With, Content-Type, Accept, Access-COntrol-Allow-Request-Method');
+    res.header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, DELETE');
+    res.header('Allow', 'GET, POST, OPTIONS, PUT, DELETE');
+    // if ('OPTIONS' == req.method) {
+    //   res.sendStatus(200);
+    // }
+    // else {
+      next();
+    // }
 });
 
+// app.use(function(req, res, next) {
+ 
+//     res.header('Access-Control-Allow-Origin', '*');
+//     res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,PATCH,OPTIONS');
+//     res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, Content-Length, X-Requested-With');
+//     res.header("Allow", "GET, POST, OPTIONS, PUT, DELETE");
+    
+//     if ('OPTIONS' == req.method) {
+//       res.sendStatus(200);
+//     }
+//     else {
+//       next();
+//     }
+// });
 // app.use((req, res, next) => {
 //   res.header("Access-Control-Allow-Origin", "*"); 
 //   res.header("Access-Control-Allow-Headers", "Authorization, X-API-KEY, Origin, X-Requested-With, Content-Type, Accept, Access-Control-Allow-Request, Method"); 
@@ -67,5 +87,5 @@ app.use('/', appRoutes);
 
 // escuchar peticiones
 app.listen(3000, () => {
-    console.log('Express server puerto 30000: \x1b[32m%s\x1b[0m', 'online');
+    console.log('Express server puerto 3000: \x1b[32m%s\x1b[0m', 'online');
 });
